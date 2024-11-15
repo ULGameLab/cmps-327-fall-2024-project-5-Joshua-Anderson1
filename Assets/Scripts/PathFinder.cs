@@ -58,7 +58,32 @@ public class PathFinder
             // You just need to fill code inside this foreach only
             foreach (Tile nextTile in current.tile.Adjacents)
             {
-                
+                // If it is not walkable or if it is on the DONE list, ignore it.
+                if(!DoneList.Exists(n => n.tile == nextTile))
+                {
+                    // If it isn’t on the TODO list, add it to the TODO list. Make the current square the parent of
+                    // this square. Record the F, G, and H costs of the square.
+                    if(!TODOList.Exists(n => n.tile == nextTile))
+                    {
+                        double gValue = current.costSoFar + HeuristicsDistance(current.tile, nextTile);
+                        double fValue = gValue + HeuristicsDistance(nextTile, goal);
+                        Node nextNode = new Node(nextTile, fValue, current, gValue);
+                        TODOList.Add(nextNode);
+                    } else
+                    {
+                        // If it is on the TODO list already, check to see if this path to that square is better,using G
+                        // cost as the measure.
+                        int index = TODOList.FindIndex(n => n.tile == nextTile);
+                        double gValue = current.costSoFar + HeuristicsDistance(current.tile, nextTile);
+                        if(gValue < TODOList[index].costSoFar)
+                        {
+                            // Change the parent of the square to the current square, and recalculate the G and F scores of the square.
+                            TODOList[index].cameFrom = current;
+                            TODOList[index].costSoFar = gValue;
+                            TODOList[index].priority = gValue + HeuristicsDistance(TODOList[index].tile, goal);
+                        }
+                    }
+                }
             }
         }
         return new Queue<Tile>(); // Returns an empty Path if no path is found
@@ -92,7 +117,7 @@ public class PathFinder
             // Just increase the F cost of the enemy tile and the tiles around it by a certain ammount (say 30)
             foreach (Tile nextTile in current.tile.Adjacents)
             {
-
+                
             }
         }
         return new Queue<Tile>(); // Returns an empty Path

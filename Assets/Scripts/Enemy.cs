@@ -122,6 +122,7 @@ public class Enemy : MonoBehaviour
                 }
 
                 break;
+
             default:
                 state = EnemyState.DEFAULT;
                 break;
@@ -131,12 +132,128 @@ public class Enemy : MonoBehaviour
     // TODO: Enemy chases the player when it is nearby
     private void HandleEnemyBehavior2()
     {
-        
+         switch (state)
+         {
+            case EnemyState.DEFAULT: 
+
+                if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, 20);
+
+                if (path.Count > 0)
+                {
+                    targetTile = path.Dequeue();
+                    state = EnemyState.MOVING;
+                }
+                break;
+
+            case EnemyState.MOVING:
+                //move
+                speed = 1.0f;
+                velocity = targetTile.gameObject.transform.position - transform.position;
+                transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
+                
+                //if target reached
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                {
+                    currentTile = targetTile;
+                    state = EnemyState.DEFAULT;
+                }
+
+                if (Vector3.Distance(playerGameObject.gameObject.transform.position, transform.position) < visionDistance)
+                {
+                    path = pathFinder.FindPathAStar(currentTile, playerGameObject.GetComponent<Player>().currentTile);
+                    if (path.Count > 0)
+                    {
+                    targetTile = path.Dequeue();
+                    state = EnemyState.CHASE;
+                    }
+
+                    break;
+
+                }
+
+                break;
+
+            case EnemyState.CHASE:
+                //move
+                speed = 2.0f;
+                velocity = targetTile.gameObject.transform.position - transform.position;
+                transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
+                
+                //if target reached
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                {
+                    currentTile = targetTile;
+                    state = EnemyState.DEFAULT;
+                }
+                break;
+
+            default:
+                state = EnemyState.DEFAULT;
+                break;
+         }
     }
 
     // TODO: Third behavior (Describe what it does)
     private void HandleEnemyBehavior3()
     {
+        switch (state)
+         {
+            case EnemyState.DEFAULT: 
 
+                if (path.Count <= 0) path = pathFinder.RandomPath(currentTile, 20);
+
+                if (path.Count > 0)
+                {
+                    targetTile = path.Dequeue();
+                    state = EnemyState.MOVING;
+                }
+                break;
+
+            case EnemyState.MOVING:
+                //move
+                speed = 1.0f;
+                velocity = targetTile.gameObject.transform.position - transform.position;
+                transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
+                
+                //if target reached
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                {
+                    currentTile = targetTile;
+                    state = EnemyState.DEFAULT;
+                }
+
+                if (Vector3.Distance(playerGameObject.gameObject.transform.position, transform.position) < visionDistance)
+                {
+                    path = pathFinder.FindPathAStar(currentTile, playerGameObject.GetComponent<Player>().currentTile.Adjacents[0].Adjacents[0]);
+                    if (path.Count > 0)
+                    {
+                    targetTile = path.Dequeue();
+                    state = EnemyState.CHASE;
+                    }
+
+                    break;
+
+                }
+
+                break;
+
+            case EnemyState.CHASE:
+                //move
+                speed = 2.0f;
+                velocity = targetTile.gameObject.transform.position - transform.position;
+                transform.position = transform.position + (velocity.normalized * speed) * Time.deltaTime;
+                
+                //if target reached
+                if (Vector3.Distance(transform.position, targetTile.gameObject.transform.position) <= 0.05f)
+                {
+                    currentTile = targetTile;
+                    state = EnemyState.DEFAULT;
+                }
+                break;
+
+            default:
+                state = EnemyState.DEFAULT;
+                break;
+         }
     }
 }
